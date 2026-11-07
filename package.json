@@ -1,0 +1,13 @@
+{
+  "name": "captain-nova",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A self-contained retro browser platformer inspired by early PC adventures.",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

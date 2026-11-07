@@ -18,12 +18,49 @@ play in a modern browser, with keyboard and touchscreen controls.
   shots. Charge your weapon for powerful projectiles that pierce enemies.
 - **A rechargeable jetpack:** take to the skies, release to recover fuel, and
   instantly re-engage while falling after activating it in that flight.
-- **Short, controllable air dashes:** escape danger or stretch a jump. Release the
+- **Short, controllable dashes:** escape danger or stretch a jump. Release the
   dash key to cut it short.
 - **Tall worlds to explore:** each region spans over 2,000 vertical pixels, with
   optional sky ruins and a bonus cache over 1,400 pixels above the main route.
+- **22 unique enemies:** every creature has its own name, pixel-art silhouette,
+  palette, and movement or attack pattern.
 - **A retro soundscape:** original music for each region and sound effects for
   movement, combat, upgrades, and discoveries.
+
+## The creatures of Kepler-9
+
+Every enemy is a distinct creature, rather than a repeated or recolored sprite.
+Names appear as you approach; wounded enemies show their remaining health.
+
+<details>
+<summary>Enemy field guide — all 22 creatures</summary>
+
+| Region | Creature | Watch for |
+| --- | --- | --- |
+| Coast | Pebbleback | A steady rock-armored patrol |
+| Coast | Lantern Snail | Stops and starts beneath its glowing shell |
+| Coast | Moon Moth | Wide, weaving flights |
+| Coast | Spindle Crab | Sudden skittering bursts |
+| Coast | Prism Beetle | A slow, heavily armored shell |
+| Coast | Comet Ray | Long, shallow glides |
+| Coast | Ember Mole | Dips beneath the surface |
+| Ruins | Obsidian Tortoise | A stubborn, slow-moving tank |
+| Ruins | Echo Wisp | A floating figure-eight path |
+| Ruins | Ruin Sentry | Aimed energy bolts |
+| Ruins | Iron Locust | Sharp zigzag turns |
+| Ruins | Coil Viper | Lunging bursts and venom bolts |
+| Ruins | Orbit Drone | Circular patrols and paired shots |
+| Ruins | Relic Mimic | Speeds up when you come close |
+| Citadel | Ash Hopper | Repeated hopping attacks |
+| Citadel | Kestrel Bot | Swoops and fast horizontal bolts |
+| Citadel | Flame Turret | Three-way fire spreads |
+| Citadel | Glasswing | Rapid, delicate fluttering |
+| Citadel | Magma Crawler | Leaves short-lived embers behind |
+| Citadel | Halo Sentinel | Slow, aimed energy orbs |
+| Citadel | Void Bat | Deep diving flights |
+| Citadel | Beacon Guardian | Staggered two-shot volleys |
+
+</details>
 
 ## Controls
 
@@ -35,7 +72,7 @@ keyboard keys; the game fills the window in landscape or portrait.
 | Move | Left / Right arrows or A / D |
 | Jump | Up arrow or W; hold for a higher jump |
 | Jetpack | Hold Up or W for one second to activate |
-| Air dash | Hold **Shift** while airborne; release to stop early |
+| Dash | Hold **Shift** on the ground or in midair; release to stop early |
 | Shoot | **Space** |
 | Charge a super shot | Hold Space for 1.1 seconds, then release |
 | Use portal / extract | E or Enter near a portal |
@@ -56,7 +93,8 @@ refuelling.
 
 Dashes travel up to roughly **106 pixels**, one-third of the original range.
 They stop on release or after **0.127 seconds**, even if you keep holding Shift.
-Each landing restores the dash. Walls and locked gates still block it; extra
+Dashes work while standing or running as well as in the air. Ground dashes
+recharge when they end; landing restores an air dash. Walls and locked gates still block it; extra
 jumps and double direction taps do not trigger it.
 
 Blaster levels **1, 2, and 3** fire **one, two, and three** projectiles for both

@@ -165,7 +165,7 @@ test('touch controls support moving and jumping together on a narrow screen', as
   await page.getByRole('button', { name: 'START GAME' }).click();
   const right = page.getByRole('button', { name: 'Move right', exact: true });
   const jump = page.getByRole('button', { name: 'Jump', exact: true });
-  const dash = page.getByRole('button', { name: 'Air dash', exact: true });
+  const dash = page.getByRole('button', { name: 'Dash', exact: true });
   const r = await right.boundingBox(), j = await jump.boundingBox(), d = await dash.boundingBox();
   const cdp = await page.context().newCDPSession(page);
   const finger1 = { x: r.x + r.width / 2, y: r.y + r.height / 2, id: 1 };

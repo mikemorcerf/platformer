@@ -7,7 +7,7 @@ async function tick(page, seconds) {
   }, seconds);
 }
 
-test('holding Tab in midair dashes one-third as far, then stops at its time limit', async ({ page }) => {
+test('holding Shift in midair dashes one-third as far, then stops at its time limit', async ({ page }) => {
   await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
   await page.goto('/?test=1');
   await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
@@ -17,7 +17,7 @@ test('holding Tab in midair dashes one-third as far, then stops at its time limi
   expect(await page.evaluate(() => window.__nova.player.dashReady)).toBe(true);
   await page.keyboard.up('KeyW');
   const before = await page.evaluate(() => ({ ...window.__nova.player }));
-  await page.keyboard.down('Tab');
+  await page.keyboard.down('ShiftLeft');
   await tick(page, .1);
   const active = await page.evaluate(() => ({ ...window.__nova.player }));
   expect(active.dashTime).toBeGreaterThan(0);
@@ -35,30 +35,30 @@ test('holding Tab in midair dashes one-third as far, then stops at its time limi
   await tick(page, .2);
   expect(await page.evaluate(() => window.__nova.player.dashTime)).toBe(0);
   expect(await page.evaluate(() => window.__nova.audio.effects.dash)).toBe(1);
-  await page.keyboard.up('Tab');
+  await page.keyboard.up('ShiftLeft');
   await tick(page, .65);
   expect(await page.evaluate(() => window.__nova.player.grounded)).toBe(true);
   expect(await page.evaluate(() => window.__nova.player.dashReady)).toBe(true);
   await page.keyboard.down('KeyW'); await tick(page, .15); await page.keyboard.up('KeyW');
   const rightEdge = await page.evaluate(() => window.__nova.player.x);
-  await page.keyboard.down('ArrowLeft'); await page.keyboard.down('Tab');
+  await page.keyboard.down('ArrowLeft'); await page.keyboard.down('ShiftLeft');
   await tick(page, 16 / 120);
   const distance = rightEdge - await page.evaluate(() => window.__nova.player.x);
   expect(distance).toBeGreaterThan(104);
   expect(distance).toBeLessThan(109);
 });
 
-test('releasing Tab immediately interrupts the dash without restoring its charge', async ({ page }) => {
+test('releasing Shift immediately interrupts the dash without restoring its charge', async ({ page }) => {
   await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
   await page.goto('/?test=1');
   await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
   await page.getByRole('button', { name: 'START GAME', exact: true }).click();
   await page.keyboard.down('KeyW'); await tick(page, .15); await page.keyboard.up('KeyW');
   const origin = await page.evaluate(() => window.__nova.player.x);
-  await page.keyboard.down('Tab'); await tick(page, 5 / 120);
+  await page.keyboard.down('ShiftLeft'); await tick(page, 5 / 120);
   const atRelease = await page.evaluate(() => window.__nova.player.x);
   expect(atRelease - origin).toBeCloseTo(35, 0);
-  await page.keyboard.up('Tab');
+  await page.keyboard.up('ShiftLeft');
   expect(await page.evaluate(() => window.__nova.player.dashTime)).toBe(0);
   expect(await page.evaluate(() => Math.abs(window.__nova.player.vx))).toBeLessThanOrEqual(190);
   expect(await page.evaluate(() => window.__nova.player.dashReady)).toBe(false);
@@ -66,7 +66,7 @@ test('releasing Tab immediately interrupts the dash without restoring its charge
   expect(await page.evaluate(() => window.__nova.player.vy)).toBeGreaterThan(0);
   expect(await page.evaluate(() => window.__nova.player.x) - atRelease).toBeLessThan(10);
   // Repressing in the same flight cannot restart the cancelled dash.
-  await page.keyboard.down('Tab'); await tick(page, .05);
+  await page.keyboard.down('ShiftLeft'); await tick(page, .05);
   expect(await page.evaluate(() => window.__nova.player.dashTime)).toBe(0);
   expect(await page.evaluate(() => window.__nova.audio.effects.dash)).toBe(1);
 });
@@ -80,7 +80,7 @@ test('an air dash collides with a locked gate instead of crossing it', async ({ 
     window.__nova.game.zone = 1;
     Object.assign(window.__nova.player, { x: 1545, y: 230, vx: 0, vy: 0, grounded: false, coyote: 0, dir: 1 });
   });
-  await page.keyboard.down('Tab');
+  await page.keyboard.down('ShiftLeft');
   await tick(page, .38);
   expect(await page.evaluate(() => window.__nova.player.x)).toBeLessThanOrEqual(1619);
   expect(await page.evaluate(() => window.__nova.player.dashTime)).toBe(0);

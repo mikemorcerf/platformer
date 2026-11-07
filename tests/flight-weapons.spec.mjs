@@ -37,7 +37,26 @@ test('holding Up for one second starts a jetpack, consumes fuel, and releasing r
   expect(await page.evaluate(() => window.__nova.audio.effects.jetStart)).toBe(1);
 });
 
-test('an empty jetpack stops and requires a fresh hold instead of flickering back on', async ({ page }) => {
+test('the jetpack instantly re-engages while falling after it has been activated in that flight', async ({ page }) => {
+  await launch(page);
+  await page.keyboard.down('ArrowUp'); await tick(page, 1.6);
+  expect((await player(page)).jetUnlocked).toBe(true);
+  await page.keyboard.up('ArrowUp'); await tick(page, .25);
+  expect((await player(page)).grounded).toBe(false);
+  expect((await player(page)).vy).toBeGreaterThan(0);
+  const fuel = (await player(page)).jetFuel;
+  await page.keyboard.down('ArrowUp'); await tick(page, 1 / 120);
+  expect((await player(page)).jetActive).toBe(true);
+  expect((await player(page)).jetFuel).toBeLessThan(fuel);
+  expect((await player(page)).vy).toBeLessThan(0);
+  await page.keyboard.up('ArrowUp'); await tick(page, 1.2);
+  expect((await player(page)).grounded).toBe(true);
+  expect((await player(page)).jetUnlocked).toBe(false);
+  await page.keyboard.down('ArrowUp'); await tick(page, .1);
+  expect((await player(page)).jetActive).toBe(false);
+});
+
+test('an empty jetpack stops and requires a fresh press instead of flickering back on', async ({ page }) => {
   await launch(page);
   await page.keyboard.down('ArrowUp');
   await tick(page, 4.5);
@@ -51,7 +70,7 @@ test('an empty jetpack stops and requires a fresh hold instead of flickering bac
   expect((await player(page)).jetFuel).toBeGreaterThan(empty.jetFuel);
   await page.keyboard.up('ArrowUp');
   await page.keyboard.down('ArrowUp');
-  await tick(page, 1.05);
+  await tick(page, 1 / 120);
   expect((await player(page)).jetActive).toBe(true);
   expect((await player(page)).jetFuel).toBeGreaterThan(0);
 });
@@ -116,7 +135,7 @@ test('early release and pausing discard unfinished shot charge', async ({ page }
   expect(await page.evaluate(() => window.__nova.bullets.some(b => b.charged))).toBe(false);
 });
 
-test('only Tab triggers an air dash; extra jumps and repeated direction taps do not', async ({ page }) => {
+test('only Shift triggers an air dash; extra jumps and repeated direction taps do not', async ({ page }) => {
   await launch(page);
   await page.keyboard.down('KeyW'); await tick(page, .15); await page.keyboard.up('KeyW');
   await page.keyboard.press('KeyW');
@@ -124,9 +143,9 @@ test('only Tab triggers an air dash; extra jumps and repeated direction taps do 
   await tick(page, .03);
   expect((await player(page)).dashTime).toBe(0);
   expect((await player(page)).dashReady).toBe(true);
-  await page.keyboard.down('Tab'); await tick(page, .05);
+  await page.keyboard.down('ShiftLeft'); await tick(page, .05);
   expect((await player(page)).dashTime).toBeGreaterThan(0);
   expect(await page.evaluate(() => document.activeElement.id)).toBe('game');
-  await page.keyboard.up('Tab');
+  await page.keyboard.up('ShiftLeft');
   expect((await player(page)).dashTime).toBe(0);
 });

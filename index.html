@@ -68,7 +68,7 @@
 <body data-mode="title">
   <main class="game-wrap" id="game-wrap" aria-label="Captain Nova game">
     <div class="stage" id="stage">
-      <canvas id="game" width="768" height="540" tabindex="0" aria-label="Platform adventure. Move with arrows or A and D. Up or W jumps. Hold Up for one second to activate the jetpack; fuel recharges while idle. Hold Tab in midair to dash; release to stop. Space shoots; hold Space to charge a super shot, then release to fire. Use E at a portal. Escape pauses. M toggles music and sound. Climb the sky ruins to find bonus caches.">Your browser needs Canvas support to play Captain Nova.</canvas>
+      <canvas id="game" width="768" height="540" tabindex="0" aria-label="Platform adventure. Move with arrows or A and D. Up or W jumps. Hold Up for one second to activate the jetpack; fuel recharges while idle. Hold Shift in midair to dash; release to stop. Space shoots; hold Space to charge a super shot, then release to fire. Use E at a portal. Escape pauses. M toggles music and sound. Climb the sky ruins to find bonus caches.">Your browser needs Canvas support to play Captain Nova.</canvas>
       <div class="overlay" id="overlay" data-screen="title">
         <div class="transmission" id="overlay-kicker"></div>
         <h1 id="overlay-title">CAPTAIN <em>NOVA</em></h1>
@@ -83,7 +83,7 @@
         <div class="control-hint" aria-label="Keyboard controls">
           <div class="control-command"><div class="key-group"><kbd>←</kbd><kbd>→</kbd><span class="key-or key-alt">/</span><kbd class="key-alt">A</kbd><kbd class="key-alt">D</kbd></div><span>MOVE</span></div>
           <div class="control-command"><div class="key-group"><kbd>↑</kbd><span class="key-or">/</span><kbd>W</kbd></div><span>JUMP</span></div>
-          <div class="control-command"><div class="key-group"><kbd class="wide">TAB</kbd></div><span>AIR DASH</span><small>HOLD · RELEASE TO STOP</small></div>
+          <div class="control-command"><div class="key-group"><kbd class="wide">SHIFT</kbd></div><span>AIR DASH</span><small>HOLD · RELEASE TO STOP</small></div>
           <div class="control-command"><div class="key-group"><kbd>↑</kbd></div><span>JETPACK</span><small>HOLD FOR 1 SECOND</small></div>
           <div class="control-command"><div class="key-group"><kbd class="wide">SPACE</kbd></div><span>SHOOT</span><small>HOLD TO CHARGE<br>RELEASE TO FIRE</small></div>
           <div class="control-command"><div class="key-group"><kbd>E</kbd></div><span>PORTAL</span></div>
@@ -176,7 +176,7 @@
       effectVoices.clear();
       world=makeWorlds();
       game={mode:'title',zone:0,hp:5,lives:3,score:0,relics:[false,false,false],boots:false,key:false,weapon:1,time:0,checkpoint:{zone:0,x:100,y:360},flash:0,transition:0,transitionTarget:null};
-      player={x:130,y:326,w:21,h:34,vx:0,vy:0,dir:1,grounded:true,coyote:.1,jumpBuffer:0,cooldown:0,invuln:0,walk:0,dashReady:true,dashTime:0,dashDir:1,trailTimer:0,stepTimer:0,jetFuel:100,jetHold:0,jetActive:false,jetLocked:false,jetTrail:0,charge:0};
+      player={x:130,y:326,w:21,h:34,vx:0,vy:0,dir:1,grounded:true,coyote:.1,jumpBuffer:0,cooldown:0,invuln:0,walk:0,dashReady:true,dashTime:0,dashDir:1,trailTimer:0,stepTimer:0,jetFuel:100,jetHold:0,jetActive:false,jetLocked:false,jetUnlocked:false,jetTrail:0,charge:0};
       bullets=[]; enemyShots=[]; particles=[]; floaters=[]; dashGhosts=[]; camera=0; shake=0; message=null;
       clearInput(); snapCamera(); uiDirty=true; updateUI(); document.body.dataset.mode=game.mode; syncMusic();
     }
@@ -357,7 +357,7 @@
       if(game.mode==='gameover'||game.mode==='won') reset();
       const fresh=game.mode==='title'; game.mode='playing'; document.body.dataset.mode='playing'; $('overlay').hidden=true; clearInput(); canvas.focus({preventScroll:true});
       syncMusic(); sound(fresh?'start':'resume');
-      if(fresh) notify('WELCOME TO KEPLER-9','Up / W: jump. Tab: dash. Space: shoot or hold to charge.',5);
+      if(fresh) notify('WELCOME TO KEPLER-9','Up / W: jump. Shift: dash. Space: shoot or hold to charge.',5);
     }
     function pause() {
       if(game.mode==='playing') { game.mode='pause'; showOverlay('pause'); sound('pause'); }
@@ -383,7 +383,7 @@
       game.lives--; uiDirty=true; sound(game.lives<=0?'gameover':'death'); clearInput(); player.dashTime=0; dashGhosts=[];
       if(game.lives<=0) { game.hp=0; game.mode='gameover'; showOverlay('gameover'); return; }
       const cp=game.checkpoint; game.zone=cp.zone; player.x=cp.x; player.y=cp.y-player.h; player.vx=player.vy=0; player.grounded=true; player.invuln=2.2;
-      game.hp=5; bullets=[]; enemyShots=[]; player.dashReady=true; player.jetFuel=100; snapCamera(); shake=0; syncMusic(); sound('respawn');
+      game.hp=5; bullets=[]; enemyShots=[]; player.dashReady=true; player.jetFuel=100; player.jetUnlocked=false; snapCamera(); shake=0; syncMusic(); sound('respawn');
       notify('SUIT RECALLED','Back at the checkpoint. Your relics and upgrades are safe.',3.5);
     }
     function collect(it) {
@@ -424,7 +424,7 @@
       player.charge=0; uiDirty=true; syncContinuousAudio();
     }
     function jetHeld() { return physical.has('ArrowUp')||physical.has('KeyW')||physical.has('jump'); }
-    function dashHeld() { return physical.has('Tab')||physical.has('dash'); }
+    function dashHeld() { return physical.has('ShiftLeft')||physical.has('ShiftRight')||physical.has('dash'); }
     function updateJetpack(dt,dashing) {
       const wasActive=player.jetActive, beforeFuel=Math.round(player.jetFuel);
       if(jetHeld()) player.jetHold+=dt;
@@ -432,7 +432,8 @@
       player.jetActive=player.jetHold>=1&&player.jetFuel>0&&!player.jetLocked&&!dashing;
       if(player.jetActive) {
         player.jetFuel=Math.max(0,player.jetFuel-30*dt);
-        if(!wasActive) sound('jetStart');
+        if(!wasActive) { sound('jetStart'); if(player.jetUnlocked&&player.vy>0) player.vy=0; }
+        player.jetUnlocked=true;
         player.vy=Math.max(-235,player.vy-1800*dt);
         player.jetTrail-=dt;
         if(player.jetTrail<=0) { player.jetTrail=.055; burst(player.x+5,player.y+36,'#d8bdff',2); }
@@ -474,7 +475,7 @@
         if(game.transition<=.3&&game.transitionTarget) {
           const {target,back}=game.transitionTarget; game.zone=target;
           player.x=back?world[target].exit.x-75:110; player.y=326; player.vx=player.vy=0; player.grounded=true; player.invuln=1.8;
-          player.dashReady=true; player.dashTime=0; dashGhosts=[]; syncMusic();
+          player.dashReady=true; player.dashTime=0; player.jetUnlocked=false; dashGhosts=[]; syncMusic();
           game.checkpoint={zone:target,x:player.x,y:360}; snapCamera();
           game.transitionTarget=null; bullets=[]; enemyShots=[]; uiDirty=true; notify('0'+(target+1)+' — '+names[target],['Violet skies. Strange company.','Something ancient is still listening.','The last relic waits above the clouds.'][target],4);
         }
@@ -534,6 +535,7 @@
       }
       if(player.y<WORLD_TOP+24) { player.y=WORLD_TOP+24; player.vy=Math.max(0,player.vy); }
       if(player.grounded) {
+        if(!player.jetActive) player.jetUnlocked=false;
         if(!wasGrounded&&fallSpeed>100) { sound('land'); burst(player.x+10,player.y+34,palettes[game.zone].edge,5); }
         if(!player.dashReady) { player.dashReady=true; uiDirty=true; }
         player.dashTime=0;
@@ -888,11 +890,12 @@
       } else accumulator=0;
       draw(dt); requestAnimationFrame(frame);
     }
-    const controls={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Tab:'dash',Space:'fire',KeyE:'interact'};
+    const controls={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',ShiftLeft:'dash',ShiftRight:'dash',Space:'fire',KeyE:'interact'};
     function syncControls() { keys=new Set([...physical].map(k=>controls[k]||k)); }
     function pressControl(code,control) {
       if(physical.has(code)) return;
       physical.add(code); syncControls(); pressed.add(control);
+      if(control==='jump'&&!player.grounded&&player.vy>0&&player.jetUnlocked&&player.jetFuel>0&&!player.jetLocked) player.jetHold=1;
     }
     function releaseControl(code) {
       physical.delete(code); syncControls();
@@ -901,8 +904,6 @@
       if(!jetHeld()) { player.jetHold=0; player.jetActive=false; player.jetLocked=false; syncContinuousAudio(); }
     }
     document.addEventListener('keydown',e=>{
-      // Tab remains ordinary keyboard navigation on menus.
-      if(e.code==='Tab'&&game.mode!=='playing') return;
       if(controls[e.code]||['Escape','Enter','KeyM','KeyP','KeyF'].includes(e.code)) {
         if(e.target instanceof HTMLButtonElement && ['Space','Enter'].includes(e.code)) return;
         e.preventDefault();

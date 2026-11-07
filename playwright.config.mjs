@@ -11,7 +11,7 @@ export default defineConfig({
     viewport: { width: 1440, height: 1000 },
     headless: true,
     launchOptions: {
-      ...(process.env.CHROMIUM_PATH || existsSync('/usr/bin/chromium')
+      ...(process.env.CHROMIUM_PATH || (!process.env.CI && existsSync('/usr/bin/chromium'))
         ? { executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium' } : {}),
       args: ['--no-sandbox']
     }

@@ -130,7 +130,7 @@ test('music and effects produce audible samples; pause and mute stop the soundtr
     n.game.relics[0] = true; n.game.boots = true;
     Object.assign(n.player, { x: 2420, y: 326, vx: 0, vy: 0, grounded: true });
   });
-  await page.keyboard.press('KeyE');
+  await page.keyboard.press('ArrowUp');
   await expect.poll(() => page.evaluate(() => window.__nova.audio.track)).toBe(1);
   expect(errors).toEqual([]);
 });

@@ -68,7 +68,7 @@
 <body data-mode="title">
   <main class="game-wrap" id="game-wrap" aria-label="Captain Nova game">
     <div class="stage" id="stage">
-      <canvas id="game" width="768" height="540" tabindex="0" aria-label="Platform adventure. Move with arrows or A and D. Up or W jumps. Hold Up for one second to activate the jetpack; fuel recharges while idle. Hold Shift to dash on the ground or in midair; release to stop. Space shoots; hold Space to charge a super shot, then release to fire. Use E at a portal. Escape pauses. M toggles music and sound. Climb the sky ruins to find bonus caches.">Your browser needs Canvas support to play Captain Nova.</canvas>
+      <canvas id="game" width="768" height="540" tabindex="0" aria-label="Platform adventure. Move with arrows or A and D. Up or W jumps. Hold Up for one second to activate the jetpack; fuel recharges while idle. Hold Shift to dash on the ground or in midair; release to stop. Space shoots; hold Space to charge a super shot, then release to fire. Press Up beside a door or portal to enter it. Escape pauses. M toggles music and sound. Climb the sky ruins to find bonus caches.">Your browser needs Canvas support to play Captain Nova.</canvas>
       <div class="overlay" id="overlay" data-screen="title">
         <div class="transmission" id="overlay-kicker"></div>
         <h1 id="overlay-title">CAPTAIN <em>NOVA</em></h1>
@@ -86,7 +86,7 @@
           <div class="control-command"><div class="key-group"><kbd class="wide">SHIFT</kbd></div><span>DASH</span><small>HOLD · RELEASE TO STOP</small></div>
           <div class="control-command"><div class="key-group"><kbd>↑</kbd></div><span>JETPACK</span><small>HOLD FOR 1 SECOND</small></div>
           <div class="control-command"><div class="key-group"><kbd class="wide">SPACE</kbd></div><span>SHOOT</span><small>HOLD TO CHARGE<br>RELEASE TO FIRE</small></div>
-          <div class="control-command"><div class="key-group"><kbd>E</kbd></div><span>PORTAL</span></div>
+          <div class="control-command"><div class="key-group"><kbd>↑</kbd></div><span>ENTER DOOR</span></div>
           <div class="control-footer"><span><kbd>ESC</kbd>PAUSE</span><span><kbd>M</kbd>MUSIC / SOUND</span><span><kbd>F</kbd>FULL SCREEN</span></div>
         </div>
       </div>
@@ -523,6 +523,10 @@
         } else changeZone(game.zone+1);
       } else if(game.zone>0 && player.x<115 && Math.abs(player.y+player.h-360)<30 && player.grounded) changeZone(game.zone-1,true);
     }
+    function besidePortal() {
+      const z=world[game.zone];
+      return player.grounded&&((near(player,z.exit,62)&&Math.abs(player.y+player.h-z.exit.y)<30)||(game.zone>0&&player.x<115&&Math.abs(player.y+player.h-360)<30));
+    }
     function updateEnemy(e,dt) {
       const d=ENEMY_ROSTER[e.species], t=e.phase;
       e.phase+=dt; e.flash=Math.max(0,e.flash-dt); e.hidden=false;
@@ -848,7 +852,7 @@
         pixelText(back?'RETURN':'PORTAL',x,y-92,8,color,'center');
       }
       if(game.mode==='playing'&&near(player,{x},65)&&Math.abs(player.y+player.h-y)<45) {
-        const label=final?'E  EXTRACT':back?'E  RETURN':'E  ENTER';
+        const label=final?'↑ EXTRACT':back?'↑ RETURN':'↑ ENTER';
         rect(x-43,y-135,86,22,'#0e2435e8'); pixelText(label,x,y-128,9,'#e5dcee','center');
       }
     }
@@ -995,10 +999,11 @@
       } else accumulator=0;
       draw(dt); requestAnimationFrame(frame);
     }
-    const controls={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',ShiftLeft:'dash',ShiftRight:'dash',Space:'fire',KeyE:'interact'};
+    const controls={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',ShiftLeft:'dash',ShiftRight:'dash',Space:'fire'};
     function syncControls() { keys=new Set([...physical].map(k=>controls[k]||k)); }
     function pressControl(code,control) {
       if(physical.has(code)) return;
+      if(control==='jump'&&(code==='ArrowUp'||code==='jump')&&besidePortal()) { pressed.add('interact'); return; }
       physical.add(code); syncControls(); pressed.add(control);
       if(control==='jump'&&!player.grounded&&player.vy>0&&player.jetUnlocked&&player.jetFuel>0&&!player.jetLocked) player.jetHold=1;
     }
@@ -1017,7 +1022,7 @@
       if(e.code==='KeyM') { toggleSound(); return; }
       if(e.code==='KeyF') { toggleFullscreen(); return; }
       if(e.code==='Escape'||e.code==='KeyP') { pause(); return; }
-      if(e.code==='Enter') { if(game.mode!=='playing') start(); else pressed.add('interact'); return; }
+      if(e.code==='Enter') { if(game.mode!=='playing') start(); return; }
       const c=controls[e.code];
       if(c&&game.mode==='playing') pressControl(e.code,c);
     });

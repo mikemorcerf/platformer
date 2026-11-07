@@ -75,7 +75,7 @@ keyboard keys; the game fills the window in landscape or portrait.
 | Dash | Hold **Shift** on the ground or in midair; release to stop early |
 | Shoot | **Space** |
 | Charge a super shot | Hold Space for 1.1 seconds, then release |
-| Use portal / extract | E or Enter near a portal |
+| Enter door / portal / extract | Up arrow while standing beside it |
 | Pause / resume | Escape or P |
 | Music and sound | M |
 | Full screen | F |
@@ -106,9 +106,10 @@ six damage and can pierce three enemies. Pausing cancels an unfinished charge.
 Recover each region's relic before entering its eastern portal. Find the jump
 boots on the coast, then use the ruin key to open the sealed gate in the Hollow
 Ruins. With all three relics, reach the extraction beacon at the eastern end of
-the citadel and press **E** to finish the expedition.
+the citadel and press **Up** to finish the expedition.
 
-Western portals let you revisit earlier regions. Lavender flags are checkpoints;
+Up enters doors and portals when you are standing beside them; elsewhere it
+jumps or activates the jetpack. W always jumps. Western portals let you revisit earlier regions. Lavender flags are checkpoints;
 medical supplies restore two shield points. Shiny red, glowing spikes mark
 hazardous ground. Falling or losing your shield costs a life and recalls you to
 your checkpoint, keeping your relics and upgrades. Sky caches restore your shield,

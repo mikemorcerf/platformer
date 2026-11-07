@@ -35,7 +35,7 @@ test('the entire expedition is winnable through normal movement and combat', asy
       } };
       key('Space', true);
       if (kind === 'exit') {
-        key('KeyE', true); tick(.7); key('KeyE', false);
+        key('ArrowUp', true); tick(.7); key('ArrowUp', false);
       } else {
         const dir = x > n.player.x ? 'ArrowRight' : 'ArrowLeft';
         key(dir, true);

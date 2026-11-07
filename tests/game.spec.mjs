@@ -32,7 +32,7 @@ async function collectFixture(page, type) {
 async function useExit(page) {
   const x = await page.evaluate(() => window.__nova.world[window.__nova.game.zone].exit.x);
   await place(page, x);
-  await page.keyboard.press('KeyE');
+  await page.keyboard.press('ArrowUp');
   await tick(page, .7);
 }
 
@@ -62,6 +62,29 @@ test('starts with a real scene, responds to movement, jumping, firing, and pause
   await page.keyboard.press('Enter');
   expect((await state(page)).mode).toBe('playing');
   expect(errors).toEqual([]);
+});
+
+test('Up enters nearby portals without jumping, while W stays a jump and E is unbound', async ({ page }) => {
+  await load(page);
+  await page.getByRole('button', { name: 'START GAME' }).click();
+  await page.evaluate(() => {
+    window.__nova.game.relics[0] = true;
+    window.__nova.game.boots = true;
+    Object.assign(window.__nova.player, { x: 2420, y: 326, vx: 0, vy: 0, grounded: true });
+  });
+  await page.keyboard.press('KeyE'); await tick(page, .03);
+  expect((await state(page)).zone).toBe(0);
+  await page.keyboard.press('Enter'); await tick(page, .03);
+  expect((await state(page)).zone).toBe(0);
+  await page.keyboard.press('ArrowUp'); await tick(page, .7);
+  expect((await state(page)).zone).toBe(1);
+  expect((await state(page)).player.grounded).toBe(true);
+  await page.keyboard.down('KeyW'); await tick(page, .2); await page.keyboard.up('KeyW');
+  expect((await state(page)).zone).toBe(1);
+  expect((await state(page)).player.y).toBeLessThan(280);
+  await place(page, 65);
+  await page.keyboard.press('ArrowUp'); await tick(page, .7);
+  expect((await state(page)).zone).toBe(0);
 });
 
 test('blaster destroys enemies; suit damage and health supplies work', async ({ page }) => {
